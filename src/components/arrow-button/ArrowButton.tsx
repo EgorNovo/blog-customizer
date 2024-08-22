@@ -14,7 +14,7 @@ export type ArrowButtonProps = {
 export const ArrowButton = (props: ArrowButtonProps | any) => {
 	const { setStateOpen, isOpen } = props;
 
-	const OnClick: OnClick = () => {
+	const onClick: OnClick = () => {
 		setStateOpen();
 	};
 
@@ -25,7 +25,7 @@ export const ArrowButton = (props: ArrowButtonProps | any) => {
 			aria-label='Открыть/Закрыть форму параметров статьи'
 			tabIndex={0}
 			className={clsx(styles.container, isOpen ? styles.container_open : '')}
-			onClick={OnClick}>
+			onClick={onClick}>
 			<img
 				src={arrow}
 				alt='иконка стрелочки'

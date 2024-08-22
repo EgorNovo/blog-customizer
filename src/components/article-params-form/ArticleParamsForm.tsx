@@ -4,6 +4,7 @@ import { RadioGroup } from '../radio-group';
 import { Select } from '../select';
 import { Separator } from '../separator';
 import { Text } from '../text';
+import { useCloseFormHook } from '../../hooks/useCloseFormHook';
 
 import {
 	fontColors,
@@ -13,6 +14,7 @@ import {
 	contentWidthArr,
 	defaultArticleState,
 	ArticleStateType,
+	OptionType,
 } from '../../constants/articleProps';
 
 import styles from './ArticleParamsForm.module.scss';
@@ -25,45 +27,28 @@ type ArticleParamsFormProps = {
 };
 
 export const ArticleParamsForm = ({ setOptions }: ArticleParamsFormProps) => {
-	const [isOpen, setOpen] = useState(false);
+	const { isOpen, setOpen, ref } = useCloseFormHook(false);
 
-	const [fontFamily, setFontFamily] = useState(
-		defaultArticleState.fontFamilyOption
-	);
-	const [fontSize, setFontSize] = useState(defaultArticleState.fontSizeOption);
-	const [fontColor, setFontColor] = useState(defaultArticleState.fontColor);
-	const [backgroundColor, setBackgroundColor] = useState(
-		defaultArticleState.backgroundColor
-	);
-	const [contentWidth, setContentWidth] = useState(
-		defaultArticleState.contentWidth
-	);
+	const [articleSettings, setArticleSettings] = useState(defaultArticleState);
+
+	const handleOnChange = (field: keyof ArticleStateType) => {
+		return (value: OptionType) => {
+			setArticleSettings((prevState) => ({ ...prevState, [field]: value }));
+		};
+	};
 
 	function reset(): void {
 		setOptions(defaultArticleState);
-		setFontFamily(defaultArticleState.fontFamilyOption);
-		setFontSize(defaultArticleState.fontSizeOption);
-		setFontColor(defaultArticleState.fontColor);
-		setBackgroundColor(defaultArticleState.backgroundColor);
-		setContentWidth(defaultArticleState.contentWidth);
+		setArticleSettings(defaultArticleState);
 	}
 
 	function submit(e: SyntheticEvent): void {
-		const data = {
-			fontFamilyOption: fontFamily,
-			fontColor: fontColor,
-			backgroundColor: backgroundColor,
-			contentWidth: contentWidth,
-			fontSizeOption: fontSize,
-		};
-
-		setOptions(data);
-
+		setOptions(articleSettings);
 		e.preventDefault();
 	}
 
 	return (
-		<>
+		<div ref={ref}>
 			<ArrowButton isOpen={isOpen} setStateOpen={() => setOpen(!isOpen)} />
 			<aside
 				className={clsx(styles.container, isOpen ? styles.container_open : '')}>
@@ -72,36 +57,36 @@ export const ArticleParamsForm = ({ setOptions }: ArticleParamsFormProps) => {
 						Задайте параметры
 					</Text>
 					<Select
-						selected={fontFamily}
+						selected={articleSettings.fontFamilyOption}
 						options={fontFamilyOptions}
 						title='ШРИФТ'
-						onChange={setFontFamily}
+						onChange={handleOnChange('fontFamilyOption')}
 					/>
 					<RadioGroup
 						name={fontSizeOptions[0].title}
 						options={fontSizeOptions}
-						selected={fontSize}
+						selected={articleSettings.fontSizeOption}
 						title='РАЗМЕР ШРИФТА'
-						onChange={setFontSize}
+						onChange={handleOnChange('fontSizeOption')}
 					/>
 					<Select
-						selected={fontColor}
+						selected={articleSettings.fontColor}
 						options={fontColors}
 						title='ЦВЕТ ШРИФТА'
-						onChange={setFontColor}
+						onChange={handleOnChange('fontColor')}
 					/>
 					<Separator />
 					<Select
-						selected={backgroundColor}
+						selected={articleSettings.backgroundColor}
 						options={backgroundColors}
 						title='ЦВЕТ ФОНА'
-						onChange={setBackgroundColor}
+						onChange={handleOnChange('backgroundColor')}
 					/>
 					<Select
-						selected={contentWidth}
+						selected={articleSettings.contentWidth}
 						options={contentWidthArr}
 						title='ШИРИНА КОНТЕНТА'
-						onChange={setContentWidth}
+						onChange={handleOnChange('contentWidth')}
 					/>
 					<div className={styles.bottomContainer}>
 						<Button title='Сбросить' type='reset' />
@@ -109,6 +94,6 @@ export const ArticleParamsForm = ({ setOptions }: ArticleParamsFormProps) => {
 					</div>
 				</form>
 			</aside>
-		</>
+		</div>
 	);
 };
